@@ -335,9 +335,17 @@ public class Histogram {
 
     // TODO: HW4 implement;
 
-    throw new UnsupportedOperationException("TODO(hw4): implement");
+    //throw new UnsupportedOperationException("TODO(hw4): implement");
 
-    // return result;
+    for (int i=0; i<this.numBuckets; i++) {
+      if (i == this.bucketIndex(qvalue)) {
+        result[i] = 1 / (float) this.buckets[i].getDistinctCount();
+      } else {
+        result[i] = 0;
+      }
+    }
+
+    return result;
   }
 
 
@@ -350,9 +358,17 @@ public class Histogram {
 
     // TODO: HW4 implement;
 
-    throw new UnsupportedOperationException("TODO(hw4): implement");
+    //throw new UnsupportedOperationException("TODO(hw4): implement");
 
-    // return result;
+    for (int i=0; i<this.numBuckets; i++) {
+      if (i == this.bucketIndex(qvalue)) {
+        result[i] = 1 - 1 / (float) this.buckets[i].getDistinctCount();
+      } else {
+        result[i] = 1;
+      }
+    }
+
+    return result;
   }
 
 
@@ -366,9 +382,19 @@ public class Histogram {
 
     // TODO: HW4 implement;
 
-    throw new UnsupportedOperationException("TODO(hw4): implement");
+    //throw new UnsupportedOperationException("TODO(hw4): implement");
 
-    // return result;
+    for (int i=0; i<this.numBuckets; i++) {
+      if (i == this.bucketIndex(qvalue)) {
+        result[i] = (this.buckets[i].getEnd() - qvalue) / this.width;
+      } else if (i < this.bucketIndex(qvalue)) {
+        result[i] = 0;
+      } else {
+        result[i] = 1;
+      }
+    }
+
+    return result;
   }
 
 
@@ -382,9 +408,19 @@ public class Histogram {
 
     // TODO: HW4 implement;
 
-    throw new UnsupportedOperationException("TODO(hw4): implement");
+    //throw new UnsupportedOperationException("TODO(hw4): implement");
 
-    // return result;
+    for (int i=0; i<this.numBuckets; i++) {
+      if (i == this.bucketIndex(qvalue)) {
+        result[i] = (qvalue - this.buckets[i].getStart()) / this.width;
+      } else if (i < this.bucketIndex(qvalue)) {
+        result[i] = 1;
+      } else {
+        result[i] = 0;
+      }
+    }
+
+    return result;
   }
 
 
