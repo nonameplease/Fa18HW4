@@ -1,12 +1,12 @@
 package edu.berkeley.cs186.database.table.stats;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 
+import edu.berkeley.cs186.database.common.BacktrackingIterator;
 import edu.berkeley.cs186.database.databox.DataBox;
 import edu.berkeley.cs186.database.query.QueryPlan.PredicateOperator;
 import edu.berkeley.cs186.database.DatabaseException;
+import edu.berkeley.cs186.database.table.RecordIterator;
 import edu.berkeley.cs186.database.table.Table;
 import edu.berkeley.cs186.database.table.Record;
 import edu.berkeley.cs186.database.databox.TypeId;
@@ -137,7 +137,37 @@ public class Histogram {
     //3. create each bucket object
 
     //4. populate the data using the increment(value) method
-    throw new UnsupportedOperationException("TODO(hw4): implement");
+    //throw new UnsupportedOperationException("TODO(hw4): implement");
+
+    maxValue = Float.MIN_VALUE;
+    minValue = Float.MAX_VALUE;
+    BacktrackingIterator<Record> iterator = table.iterator();
+    List<Float> recordList = new ArrayList<>();
+    for (int i = 0; i < table.getNumRecords(); i++) {
+      float recordVal = this.quantization(iterator.next(), attribute);
+      recordList.add(recordVal);
+      if (recordVal < minValue) {
+        minValue = recordVal;
+      }
+
+      if (recordVal > maxValue) {
+        maxValue = recordVal;
+      }
+    }
+
+    width = (maxValue - minValue)/numBuckets;
+    if (maxValue == minValue) {
+      width = 0;
+      numBuckets = 1;
+    }
+    for (int i = 0; i < numBuckets; i++) {
+      buckets[i] = new Bucket(width * i, width * (i + 1));
+    }
+
+    for (int i = 0; i < table.getNumRecords(); i++) {
+      float recordVal = recordList.get(i);
+      buckets[bucketIndex(recordVal)].increment(recordVal);
+    }
   }
 
   private int bucketIndex(float v) {
