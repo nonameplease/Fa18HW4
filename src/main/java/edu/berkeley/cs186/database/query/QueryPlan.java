@@ -241,7 +241,7 @@ public class QueryPlan {
       String column = this.selectColumnNames.get(i);
 
       if (this.transaction.indexExists(table, column) &&
-          this.selectOperators.get(i) != PredicateOperator.NOT_EQUALS) {
+              this.selectOperators.get(i) != PredicateOperator.NOT_EQUALS) {
         selectIndices.add(i);
       }
     }
@@ -319,23 +319,46 @@ public class QueryPlan {
    * @throws QueryPlanException
    */
   public QueryOperator minCostSingleAccess(String table) throws DatabaseException, QueryPlanException {
-      QueryOperator minOp = null;
+    QueryOperator minOp = null;
 
-      // Find the cost of a sequential scan of the table
-      minOp = new SequentialScanOperator(this.transaction, table);
+    // Find the cost of a sequential scan of the table
+    minOp = new SequentialScanOperator(this.transaction, table);
 
-      //TODO: HW4 Implement
+    //TODO: HW4 Implement
 
-      // 1. Find the cost of a sequential scan of the table
+    // 1. Find the cost of a sequential scan of the table
 
-      // 2. For each eligible index column, find the cost of an index scan of the
-      // table and retain the lowest cost operator
+    // 2. For each eligible index column, find the cost of an index scan of the
+    // table and retain the lowest cost operator
 
 
-      // 3. Push down SELECT predicates that apply to this table and that were not
-      // used for an index scan
-      
-      return minOp;
+    // 3. Push down SELECT predicates that apply to this table and that were not
+    // used for an index scan
+
+    List<Integer> validCol = this.getEligibleIndexColumns(table);
+
+    if (validCol.size() != 0) {
+      //If no eligible index columns can be used, then can only use sequential scan
+      //so no need to calculate the cost of a sequential scan
+
+      int seqEstIOCost = minOp.estimateIOCost();
+      int minCost = seqEstIOCost;
+
+      for (int i = 0; i < validCol.size(); i++) {
+        QueryOperator indexScanOperator = new IndexScanOperator(this.transaction, table,
+                this.selectColumnNames.get(validCol.get(i)),
+                this.selectOperators.get(validCol.get(i)),
+                this.selectDataBoxes.get(validCol.get(i)));
+
+        int indexEstIOCost = indexScanOperator.estimateIOCost();
+        if (indexEstIOCost < minCost) {
+          minCost = indexEstIOCost;
+          minOp = indexScanOperator;
+        }
+      }
+    }
+
+    return minOp;
   }
 
   /**
@@ -350,7 +373,7 @@ public class QueryPlan {
                                         QueryOperator rightOp,
                                         String leftColumn,
                                         String rightColumn) throws QueryPlanException,
-                                                                   DatabaseException {
+          DatabaseException {
     QueryOperator minOp = null;
 
     int minCost = Integer.MAX_VALUE;
@@ -382,42 +405,42 @@ public class QueryPlan {
    */
   private Map<Set, QueryOperator> minCostJoins(Map<Set, QueryOperator> prevMap,
                                                Map<Set, QueryOperator> pass1Map) throws QueryPlanException,
-                                                                                        DatabaseException {
-        Map<Set, QueryOperator> map = new HashMap<Set, QueryOperator>();
+          DatabaseException {
+    Map<Set, QueryOperator> map = new HashMap<Set, QueryOperator>();
 
-        //TODO: HW4 Implement
+    //TODO: HW4 Implement
 
-        //We provide a basic description of the logic you have to implement
+    //We provide a basic description of the logic you have to implement
 
-        //Input: prevMap (maps a set of tables to a query operator--the operator that joins the set)
-        //Input: pass1Map (each set is a singleton with one table and single table access query operator)
+    //Input: prevMap (maps a set of tables to a query operator--the operator that joins the set)
+    //Input: pass1Map (each set is a singleton with one table and single table access query operator)
 
-        //FOR EACH set of tables in prevMap:
+    //FOR EACH set of tables in prevMap:
 
-        //FOR EACH join condition listed in the query
+    //FOR EACH join condition listed in the query
 
-        //get the left side and the right side (table name and column)
+    //get the left side and the right side (table name and column)
 
-        /**
-         * Case 1. Set contains left table but not right, use pass1Map to
-         * fetch the right operator to access the rightTable
-         *
-         * Case 2. Set contains right table but not left, use pass1Map to
-         * fetch the right operator to access the leftTable.
-         *
-         * Case 3. Set contains neither or both the left table or right table (contiue loop)
-         *
-         * --- Then given the operator, use minCostJoinType to calculate the cheapest join with that
-         * and the previously joined tables.
-         */
+    /**
+     * Case 1. Set contains left table but not right, use pass1Map to
+     * fetch the right operator to access the rightTable
+     *
+     * Case 2. Set contains right table but not left, use pass1Map to
+     * fetch the right operator to access the leftTable.
+     *
+     * Case 3. Set contains neither or both the left table or right table (contiue loop)
+     *
+     * --- Then given the operator, use minCostJoinType to calculate the cheapest join with that
+     * and the previously joined tables.
+     */
 
-        /**
-         * Create a new set that is the union of the new table and previously
-         * joined tables. Add to result map this value mapping to the result from
-         * minCostJoinType if it doesn't exist or it exists and cost is lower.
-         */
+    /**
+     * Create a new set that is the union of the new table and previously
+     * joined tables. Add to result map this value mapping to the result from
+     * minCostJoinType if it doesn't exist or it exists and cost is lower.
+     */
 
-        return map;
+    return map;
   }
 
   /**

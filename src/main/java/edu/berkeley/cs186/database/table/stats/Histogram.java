@@ -156,12 +156,15 @@ public class Histogram {
     }
 
     width = (maxValue - minValue)/numBuckets;
-    if (maxValue == minValue) {
+
+    //should I really comment this out???TODO(thingking)
+    /*if (maxValue == minValue) {
       width = 0;
       numBuckets = 1;
-    }
+    }*/
+
     for (int i = 0; i < numBuckets; i++) {
-      buckets[i] = new Bucket(width * i, width * (i + 1));
+      buckets[i] = new Bucket(this.width * i, this.width * (i + 1));
     }
 
     for (int i = 0; i < table.getNumRecords(); i++) {
