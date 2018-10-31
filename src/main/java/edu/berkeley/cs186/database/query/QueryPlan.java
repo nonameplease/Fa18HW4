@@ -337,13 +337,14 @@ public class QueryPlan {
 
     List<Integer> validCol = this.getEligibleIndexColumns(table);
 
+    int indexUsedForScan = -1;
     if (validCol.size() != 0) {
       //If no eligible index columns can be used, then can only use sequential scan
       //so no need to calculate the cost of a sequential scan
 
       int seqEstIOCost = minOp.estimateIOCost();
       int minCost = seqEstIOCost;
-      int indexUsedForScan = Integer.MAX_VALUE;
+
 
       for (int i = 0; i < validCol.size(); i++) {
         QueryOperator indexScanOperator = new IndexScanOperator(this.transaction, table,
@@ -355,14 +356,13 @@ public class QueryPlan {
         if (indexEstIOCost < minCost) {
           minCost = indexEstIOCost;
           minOp = indexScanOperator;
-          minOp = new SelectOperator(indexScanOperator,)
           indexUsedForScan = i;
         }
       }
 
-      this.finalOperator = this.addEligibleSelections(minOp, indexUsedForScan);
-
     }
+
+    minOp = this.addEligibleSelections(minOp, indexUsedForScan);
 
     return minOp;
   }

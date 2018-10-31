@@ -162,8 +162,6 @@ public class TestSingleAccess {
 
     QueryOperator op = query.minCostSingleAccess("t1");
 
-    System.out.println(op.getType());
-    System.out.println(op.isSelect());
     assert(op.isSelect());
     assert(op.getSource().isSequentialScan());
   }
